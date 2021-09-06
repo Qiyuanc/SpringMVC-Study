@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSONTest</title>
+</head>
+<body>
+    <script>
+        // 创建一个 JS 对象
+        var user = { name:"祈鸢", age:18, id:7 }
+        // console.log(user)
+        var json = JSON.stringify(user)
+        console.log(json)
+        console.log("==========")
+        var obj = JSON.parse(json)
+        console.log(obj)
+    </script>
+</body>
+</html>

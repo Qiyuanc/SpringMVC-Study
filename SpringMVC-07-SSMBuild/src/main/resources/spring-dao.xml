@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--关联数据库配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!--配置连接池
+        dbcp: 半自动化操作 不能自动连接
+        c3p0: 自动化操作 自动加载配置文件
+        还有 druid hikari 以后再说-->
+    <!--这里用 c3p0 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 配置连接池属性 -->
+        <property name="driverClass" value="${driver}"/>
+        <property name="jdbcUrl" value="${url}"/>
+        <!-- 这里 name 叫 user 和 MyBatis 不一样（username）！-->
+        <property name="user" value="${user}"/>
+        <property name="password" value="${password}"/>
+
+        <!-- c3p0 连接池的私有属性 -->
+        <property name="maxPoolSize" value="30"/>
+        <property name="minPoolSize" value="10"/>
+        <!-- 关闭连接后不自动 commit -->
+        <property name="autoCommitOnClose" value="false"/>
+        <!-- 获取连接超时时间 -->
+        <property name="checkoutTimeout" value="10000"/>
+        <!-- 获取连接失败重试次数 -->
+        <property name="acquireRetryAttempts" value="2"/>
+    </bean>
+
+    <!-- SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 引用上面的数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 绑定 MyBatis 配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <!-- 配置扫描 Dao 接口的包，动态地将 Dao 接口实现类注入到 Spring 容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入 sqlSessionFactory，注意是 BeanName！所以不用 ref！ -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 给出需要扫描 Dao 接口的包 -->
+        <property name="basePackage" value="com.qiyuan.dao"/>
+    </bean>
+
+</beans>
